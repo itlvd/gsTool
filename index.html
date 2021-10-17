@@ -17,7 +17,11 @@
         var srcURL = document.getElementById("srcURL").value;
         var src = srcURL.split("folders/")[1].split("?usp=sharing")[0];
         var tarURL = document.getElementById("target").value;
-        var tar = tarURL.split("folders/")[1].split("?usp=sharing")[0];
+        var tar = "";
+        if(tarURL != ""){
+          tar = tarURL.split("folders/")[1].split("?usp=sharing")[0];
+        }
+        
 
         google.script.run.start(src,tar);
       }
