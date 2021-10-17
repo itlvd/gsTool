@@ -3,14 +3,20 @@ function doGet() {
 }
 
 function start(sourceFolderID, targetFolder) {
-  //var sourceFolderID = "16nJoHrkUEHmy1R8WB74FymBaNh";
-  //var targetFolder = "1nww48eKuN35Z_ZRfbkcat1_p";
+  //var sourceFolderID = "1_9nXZGEYUG";
+  //var targetFolder = "1SUDWEtNSnrI3";
 
   var folderID = DriveApp.getFolderById(sourceFolderID);
   var name = folderID.getName();
 
   var source = DriveApp.getFoldersByName(name);
-  var target = DriveApp.getFolderById(targetFolder);
+  if(targetFolder == ""){
+    targetFolder = "Copy of " + name;
+    target = DriveApp.createFolder(targetFolder);
+  }
+  else{
+    target = DriveApp.getFolderById(targetFolder);
+  }
 
   if (source.hasNext()) {
     copyFolder(source.next(), target);
