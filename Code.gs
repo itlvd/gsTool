@@ -1,20 +1,33 @@
+function main(){
+  let src = "https://drive.google.com/drive/folders/1_9nXZGdlGT9AktfWPa5JQIxcvgIzEYUG";
+  let des = "https://drive.google.com/drive/folders/0ADWUkOWwzpYqUk9PVA";
+
+  src = src.split("folders/")[1].split("?usp=sharing")[0];
+  des = des.split("folders/")[1].split("?usp=sharing")[0];
+
+  start(src, des);
+
+}
+
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('index');
 }
 
 function start(sourceFolderID, targetFolder) {
-  var sourceFolderID = "1_9nXZGdlGT9AktfWPa5JQIxcvgIzEYUG";
-  var targetFolder = "0ADWUkOWwzpYqUk9PVA";
+  //var sourceFolderID = "1_9nXZGdlGT9AktfWPa5JQIxcvgIzEYUG";
+  //var targetFolder = "0ADWUkOWwzpYqUk9PVA";
 
-  var folderID = DriveApp.getFolderById(sourceFolderID);
-  var name = folderID.getName();
+  let folderID = DriveApp.getFolderById(sourceFolderID);
+  let name = folderID.getName();
 
   var source = DriveApp.getFoldersByName(name);
   if(targetFolder == ""){
+    console.log("Create folder" + name);
     targetFolder = "Copy of " + name;
     target = DriveApp.createFolder(targetFolder);
   }
   else{
+    console.log("Go to target folder");
     target = DriveApp.getFolderById(targetFolder);
   }
 
@@ -41,19 +54,29 @@ function search(arr, x){
     return false;
 }
 
+function logs(str,id_sheet){
+  let open_sheet = SpreadsheetApp.openById(id_sheet);
+  let sheet = open_sheet.getSheets()[0];
+  sheet.appendRow([new Date(), str]);
+}
+
 function getAllNameOfItemsInFolder(folder){
   let arr = [];
-  var files = folder.getFiles();
-  var folders = folder.getFolders();
+  let files = folder.getFiles();
+  let folders = folder.getFolders();
   
   while(folders.hasNext()){
-    var folder = folders.next();
+    let folder = folders.next();
+    console.log("Scan folder: " + folder.getName());
     arr.push(folder.getName());
+    
   }
 
   while(files.hasNext()){
-    var file = files.next();
+    let file = files.next();
+    console.log("Scan file: " + file.getName());
     arr.push(file.getName());
+    
   }
   arr.sort();
   return arr;
@@ -62,27 +85,31 @@ function getAllNameOfItemsInFolder(folder){
 
 function copyFolder(source, target) {
 
-  var folders = source.getFolders();
-  var files   = source.getFiles();
+  let folders = source.getFolders();
+  let files   = source.getFiles();
   let list_items = getAllNameOfItemsInFolder(target);
 
   while(files.hasNext()) {
-    var file = files.next();
-    if(search(list_items,file.getName()) ==false)
+    let file = files.next();
+    if(search(list_items,file.getName()) ==false){
+      console.log("Make copy file: " + file.getName());
       file.makeCopy(file.getName(), target);
+    }
   }
 
   while(folders.hasNext()) {
-    var subFolder = folders.next();
-    var folderName = subFolder.getName();
-    var check = search(list_items,folderName);
-    var targetFolder = "";
+    let subFolder = folders.next();
+    let folderName = subFolder.getName();
+    let check = search(list_items,folderName);
+    let targetFolder = "";
     if(check == false){
+      console.log("Create subfolder: " + folderName);
       targetFolder = target.createFolder(folderName);
     }
     else{
       let x = target.getFoldersByName(folderName).next();
       x = x.getId();
+      console.log("Go to subfolder: " + folderName);
       targetFolder = DriveApp.getFolderById(x);
     }
 
