@@ -3,8 +3,8 @@ function doGet() {
 }
 
 function start(sourceFolderID, targetFolder) {
-  //var sourceFolderID = "1_9nXZGEYUG";
-  //var targetFolder = "1SUDWEtNSnrI3";
+  var sourceFolderID = "1_9nXZGdlGT9AktfWPa5JQIxcvgIzEYUG";
+  var targetFolder = "0ADWUkOWwzpYqUk9PVA";
 
   var folderID = DriveApp.getFolderById(sourceFolderID);
   var name = folderID.getName();
@@ -23,49 +23,65 @@ function start(sourceFolderID, targetFolder) {
   }
 }
 
-function checkExitsFiles(fileName, folder){
-  var files = folder.getFiles();
-  while(files.hasNext()){
-    var file = files.next();
-    if(file.getName() == fileName){
+function search(arr, x){
+  let start=0
+  let end=arr.length-1;
+
+  while (start<=end){
+    let mid = Math.floor((start+end)/2);
+
+    if (arr[mid]==x) 
       return true;
+    else if (arr[mid]< x)
+      start = mid + 1;
+    else
+      end = mid - 1;
     }
-  }
-  return false;
+  
+    return false;
 }
 
-function checkExitsFolder(folderName, folder){
+function getAllNameOfItemsInFolder(folder){
+  let arr = [];
+  var files = folder.getFiles();
   var folders = folder.getFolders();
+  
   while(folders.hasNext()){
     var folder = folders.next();
-    if(folder.getName() == folderName){
-      return folderName;
-    }
+    arr.push(folder.getName());
   }
-  return "";
+
+  while(files.hasNext()){
+    var file = files.next();
+    arr.push(file.getName());
+  }
+  arr.sort();
+  return arr;
+  
 }
 
 function copyFolder(source, target) {
 
   var folders = source.getFolders();
   var files   = source.getFiles();
+  let list_items = getAllNameOfItemsInFolder(target);
 
   while(files.hasNext()) {
     var file = files.next();
-    if(!checkExitsFiles(file.getName(), target))
+    if(search(list_items,file.getName()) ==false)
       file.makeCopy(file.getName(), target);
   }
 
   while(folders.hasNext()) {
     var subFolder = folders.next();
     var folderName = subFolder.getName();
-    var check = checkExitsFolder(folderName, target);
+    var check = search(list_items,folderName);
     var targetFolder = "";
-    if(check == ""){
+    if(check == false){
       targetFolder = target.createFolder(folderName);
     }
     else{
-      var x = target.getFoldersByName(check).next();
+      let x = target.getFoldersByName(folderName).next();
       x = x.getId();
       targetFolder = DriveApp.getFolderById(x);
     }
