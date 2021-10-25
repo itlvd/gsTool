@@ -54,24 +54,13 @@ function search(arr, x){
     return false;
 }
 
-function logs(str,id_sheet){
-  let open_sheet = SpreadsheetApp.openById(id_sheet);
-  let sheet = open_sheet.getSheets()[0];
-  sheet.appendRow([new Date(), str]);
-}
 
-function getAllNameOfItemsInFolder(folder){
+
+
+function getAllNameOfFilesInFolder(folder){
   let arr = [];
   let files = folder.getFiles();
-  let folders = folder.getFolders();
   
-  while(folders.hasNext()){
-    let folder = folders.next();
-    console.log("Scan folder: " + folder.getName());
-    arr.push(folder.getName());
-    
-  }
-
   while(files.hasNext()){
     let file = files.next();
     console.log("Scan file: " + file.getName());
@@ -83,15 +72,31 @@ function getAllNameOfItemsInFolder(folder){
   
 }
 
+function getAllNameOfSubfolderInFolder(folder){
+  let arr = [];
+  let folders = folder.getFolders();
+  
+  while(folders.hasNext()){
+    let folder = folders.next();
+    console.log("Scan folder: " + folder.getName());
+    arr.push(folder.getName());
+    
+  }
+  arr.sort();
+  return arr;
+  
+}
+
 function copyFolder(source, target) {
 
   let folders = source.getFolders();
   let files   = source.getFiles();
-  let list_items = getAllNameOfItemsInFolder(target);
+  let list_file = getAllNameOfFilesInFolder(target);
+  let list_folder = getAllNameOfSubfolderInFolder(target);
 
   while(files.hasNext()) {
     let file = files.next();
-    if(search(list_items,file.getName()) ==false){
+    if(search(list_file,file.getName()) ==false){
       console.log("Make copy file: " + file.getName());
       file.makeCopy(file.getName(), target);
     }
@@ -100,7 +105,7 @@ function copyFolder(source, target) {
   while(folders.hasNext()) {
     let subFolder = folders.next();
     let folderName = subFolder.getName();
-    let check = search(list_items,folderName);
+    let check = search(list_folder,folderName);
     let targetFolder = "";
     if(check == false){
       console.log("Create subfolder: " + folderName);
