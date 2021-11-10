@@ -1,16 +1,17 @@
+/*
+License: GPLv3 
+Author: Lê Văn Đông
+Refer: https://www.labnol.org/code/19979-copy-folders-drive
+*/
 function main(){
-  let src = "https://drive.google.com/drive/folders/1_9nXZGdlGT9AktfWPa5JQIxcvgIzEYUG";
-  let des = "https://drive.google.com/drive/folders/0ADWUkOWwzpYqUk9PVA";
+  let src = "https://drive.google.com/drive/folders/1_9nXZGdlGT9AktfWPa5JQIxcvgIzEYUG?usp=sharing";
+  let des = "https://drive.google.com/drive/folders/0APgVE4H8erK0Uk9PVA";
 
   src = src.split("folders/")[1].split("?usp=sharing")[0];
   des = des.split("folders/")[1].split("?usp=sharing")[0];
 
   start(src, des);
 
-}
-
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('index');
 }
 
 function start(sourceFolderID, targetFolder) {
@@ -36,6 +37,69 @@ function start(sourceFolderID, targetFolder) {
   }
 }
 
+/*Get last time when folder changed
+Input folder to get timestamp.
+Return timestamp
+=========================================================
+*/
+function getTimeChange(folder){
+  let request = {
+    "pageSize": 1,
+    "ancestorName": ""
+  }
+
+  let value = "items/"+ folder.getId();
+  request.ancestorName = value;
+  let response = DriveActivity.Activity.query(request);
+  let activities = response.activities;
+
+  return new Date(activities[0].timestamp).getTime();
+}
+
+/*Read logs
+Input folder.
+Return timestamp
+=========================================================
+Find the file with the name is log.txt in this folder and read it. 
+If the result equals -1. This folder wasn't copied.
+logs have a timestamp of the last activity source folder.
+*/
+function getTimeCopy(folder){
+  let content = -1;
+  let files = folder.getFilesByName("log");
+
+  if (files.hasNext())
+    content = Number(files.next().getBlob().getDataAsString());
+
+  return content;
+}
+
+/*Write logs
+Input: 
+  - timestamp - timestamp of source folder.
+  - folder - folder to write
+No return
+=========================================================
+Write to the file with name log.txt.
+Default value is -1;
+If this function is call, this folder copied.
+Write timestamp of source folder.
+*/
+function writelog(timestamp,folder){
+
+  files = folder.getFilesByName("log");
+
+  if(files.hasNext()){
+    file = files.next();
+    file.setContent(timestamp);
+  }
+  else{
+    folder.createFile("log",timestamp);
+  }
+
+}
+
+
 function search(arr, x){
   let start=0
   let end=arr.length-1;
@@ -49,13 +113,9 @@ function search(arr, x){
       start = mid + 1;
     else
       end = mid - 1;
-    }
-  
-    return false;
+  }
+  return false;
 }
-
-
-
 
 function getAllNameOfFilesInFolder(folder){
   let arr = [];
@@ -80,7 +140,6 @@ function getAllNameOfSubfolderInFolder(folder){
     let folder = folders.next();
     console.log("Scan folder: " + folder.getName());
     arr.push(folder.getName());
-    
   }
   arr.sort();
   return arr;
@@ -91,6 +150,16 @@ function copyFolder(source, target) {
 
   let folders = source.getFolders();
   let files   = source.getFiles();
+
+  Logger.log("check out the changes...");
+  let timesrc = getTimeChange(source);
+  let timetarget = getTimeCopy(target);
+
+  if(timesrc == timetarget){
+    Logger.log("No changed");
+    return; // Don't change. Don't Copy.
+  } 
+
   let list_file = getAllNameOfFilesInFolder(target);
   let list_folder = getAllNameOfSubfolderInFolder(target);
 
@@ -119,6 +188,8 @@ function copyFolder(source, target) {
     }
 
     copyFolder(subFolder, targetFolder);
+    
   }
-
+  Logger.log("Write log: " + source.getName());
+  writelog(timesrc, target);
 }
