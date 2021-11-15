@@ -1,5 +1,4 @@
 /*
-License: GPLv3 
 Author: Lê Văn Đông
 Refer: https://www.labnol.org/code/19979-copy-folders-drive
 */
