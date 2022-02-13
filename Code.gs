@@ -1,92 +1,128 @@
 /*
-Author: Lê Văn Đông
+Author: Lê Văn Đông - www.levandong.com
 Refer: https://www.labnol.org/code/19979-copy-folders-drive
 */
-function setup(){
-  var src_id = "idfolder"; //Input source folder here. Đặt Folder ID của folder nguồn tại đây.
-  var des_id = "idfolder"; // Input destination folder here. Đặt Folder ID của folder đích tại đây.
-  var reset = false; // Set true if you want to scan all files again. Set false if you only want to scan the modified file. Recommend set true. Để true nếu như bạn muốn quét lại toàn bộ file, false nếu như bạn chỉ muốn quét những file đã bị sửa đổi. Khuyến khích để true, nếu bạn muốn copy đầy đủ, false nếu bạn muốn copy nhanh.
+function main() {
+  let src = "Folder src";
+  let des = "Folder des";
 
-  var src = DriveApp.getFolderById(src_id);
-  var des = DriveApp.getFolderById(des_id);
-
-  try{
-    copy(src,des,reset);
+  try {
+    src = src.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
+    des = des.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
   }
-  catch (e){
-    Logger.log("Please check src_id and des_id again!");
-    Logger.log("Error: " + e);
+  catch (e) {
+    Logger.log("Kiểm tra lại link. Lỗi: " + e);
   }
+  start(src, des);
 }
 
-function writelog(timestamp,folder){
-  files = folder.getFilesByName("log.txt");
-  if(files.hasNext()){
-    files.next().setContent(timestamp);
+function start(sourceFolderID, targetFolder) {
+
+  var source = DriveApp.getFolderById(sourceFolderID);
+  var name = source.getName();
+  var target = null;
+
+  if (targetFolder == "") {
+    console.log("Create folder" + name);
+    targetFolder = "Copy of " + name;
+    target = DriveApp.createFolder(targetFolder);
   }
-  else{
-    folder.createFile("log.txt",timestamp);
+  else {
+    console.log("Go to target folder");
+    target = DriveApp.getFolderById(targetFolder);
   }
+
+  copyFolder(source, target);
 }
 
-function getLog(folder){
-  files = folder.getFilesByName("log.txt");
-  if(files.hasNext()){
-    return files.next().getBlob().getDataAsString();
+function getAllNameOfFilesInFolder(folder) {
+  let arr = [];
+  let files = folder.getFiles();
+
+  while (files.hasNext()) {
+    let file = files.next();
+    arr.push(file.getName());
   }
-  else{
-    return "1971-12-20T01:04:04.501Z";
-  }
+  arr.sort();
+  return arr;
+
 }
 
-function copy(src,des,reset){
+function getAllNameOfSubfolderInFolder(folder) {
+  let arr = [];
+  let folders = folder.getFolders();
 
-  //Create query
-  var query = 'modifiedDate > "1971-12-20T01:04:04.501Z"';
-  if(reset == false){
-    var time= getLog(des);
-    query = 'modifiedDate > "' + time + '"';
+  while (folders.hasNext()) {
+    let folder = folders.next();
+    arr.push(folder.getName());
+  }
+  arr.sort();
+  return arr;
+
+}
+
+function createQuerry(arr) {
+  var querry = "";
+  for (var i = 0; i < arr.length - 1;i++) {
+    querry += 'title = \"' + arr[i] + "\" or";
+  }
+  return querry + "title = \"" + arr[arr.length - 1] + "\"";
+}
+
+function copyFolder(source, target) {
+//Folder copy incomplete
+  //Change the symbol at target folder (Folder don't already copy)
+  var ispecialFolders = target.searchFolders('title contains \"chuacopyxong\"');
+  while (ispecialFolders.hasNext()) {
+    var folder = ispecialFolders.next();
+    var name = folder.getName().split("chuacopyxong ")[1];
+
+    //Find same folder in source
+    var ifolderInSource = source.getFoldersByName(name); // itor
+    while (ifolderInSource.hasNext()) { // has a
+      Logger.log("Go to: " + name);
+      copyFolder(ifolderInSource.next(), folder); // copy
+    }
+    folder.setName(name); // Done in folder. Set name again.
   }
 
-  //Get list file and folder
-  Logger.log("Search file, folder");
-  var files = src.searchFiles(query);
-  var folders = src.getFolders();
+//Copy normal
+  Logger.log("Scan source Folder");
+  var srcSubfolders = getAllNameOfSubfolderInFolder(source);
+  var srcFiles = getAllNameOfFilesInFolder(source);
+  Logger.log("Scan des Folder");
+  var desSubfolders = getAllNameOfSubfolderInFolder(target);
+  var desFiles = getAllNameOfFilesInFolder(target);
 
-  while(files.hasNext()){
-    var file = files.next();
-    var namefile = file.getName();
-    var file_itor = des.getFilesByName(namefile);
-    var mimetype = file.getMimeType();
-    if(!file_itor.hasNext()){
-      Logger.log("Make copy file: " + namefile);
-      file.makeCopy(namefile, des);
-    }
-    else{
-      Logger.log( namefile + " already exists");
-      if((mimetype == "application/vnd.google-apps.document" || mimetype == "application/vnd.google-apps.presentation" || mimetype == "application/vnd.google-apps.spreadsheet") && (file.getLastUpdated().toISOString() > getLog(des))){
-        Logger.log("This document has changed!!! Don't worry, I will copy this file again!");
-        file_itor.next().setTrashed(true);
-        file.makeCopy(namefile, des);
-      }
+  var diffFolders = srcSubfolders.filter(x => !desSubfolders.includes(x));
+  var diffFiles = srcFiles.filter(x => !desFiles.includes(x));
+
+  //Make querry
+  var querryFolder = createQuerry(diffFolders);
+  var querryFile = createQuerry(diffFiles);
+
+  //Search and Copy
+  if (querryFile != "") {
+    var files = source.searchFiles(querryFile);
+
+    //Copy files
+    while (files.hasNext()) {
+      var file = files.next();
+      var name = file.getName();
+      console.log("Make copy file: " + name);
+      file.makeCopy(name, target);
     }
   }
-
-  while(folders.hasNext()){
-    var subfolder = folders.next();
-    var namefolder = subfolder.getName();
-    var folder = des.getFoldersByName(namefolder);
-    if(folder.hasNext()){
-      folder = folder.next();
+  if (querryFolder != "") {
+    var folders = source.searchFolders(querryFolder);
+    //Copy Folder
+    while (folders.hasNext()) {
+      var folder = folders.next();
+      var name = folder.getName();
+      Logger.log("Create folder: " + name);
+      var targetSub = target.createFolder("chuacopyxong " + name);
+      copyFolder(folder, targetSub);
+      targetSub.setName(name);
     }
-    else{
-      Logger.log("Create new folder:" + subfolder.getName());
-      folder = des.createFolder(subfolder.getName());
-    }
-    Logger.log("Go to: " + folder.getName());
-    copy(subfolder,folder,reset);
   }
-
-  Logger.log("Write log at: " + des.getName());
-  writelog((new Date).toISOString(),des);
 }
