@@ -12,7 +12,7 @@ function main() {
     des = des.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
   }
   catch (e) {
-    Logger.log("Kiểm tra lại link. Lỗi: " + e);
+    Logger.log("Check source or destination folder ID again. Err: " + e);
   }
   start(src, des);
 }
