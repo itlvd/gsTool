@@ -22,4 +22,4 @@ GNU General Public License v3.0
 ## Thanks
 Thanks to these companies providing access to their services in developing gsTool.
 
-<a href="https://1password.com/?utm_source=gsTool"><img src="https://i.imgur.com/XvnmKsf.png" alt="1Password" width="100"></a>
+<a href="https://1password.com/"><img src="https://i.imgur.com/XvnmKsf.png" alt="1Password" width="100"></a>
