@@ -9,3 +9,7 @@ Make sure you change this variable in your script:
 let src = "Input source folder URL";
 let des = "Input destination folder URL";
 ```
+
+Then, turn on Drive API at Service.
+
+![](https://i.imgur.com/l6XLTvk.png)
