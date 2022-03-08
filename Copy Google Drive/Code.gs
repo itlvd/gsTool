@@ -4,17 +4,20 @@ Refer: https://www.labnol.org/code/19979-copy-folders-drive
 */
 var chunk = 100;
 function main() {
-  let src = "Folder src URL";
-  let des = "Folder des URL";
+  let src = "https://drive.google.com/drive/folders/ID";
+  let des = "https://drive.google.com/drive/folders/ID";
 
-  try {
+  try { // Pass this if user input FolderID.
     src = src.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
     des = des.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
+    var count = getNumber(des);
+    setupTrigger(count);
+    start(src, des);
+    deleteTrigger();
   }
   catch (e) {
-    Logger.log("Check source or destination folder ID again. Err: " + e);
+    Logger.log("Kiểm tra lại link. Lỗi: " + e);
   }
-  start(src, des);
 }
 
 function start(sourceFolderID, targetFolder) {
@@ -24,7 +27,7 @@ function start(sourceFolderID, targetFolder) {
   var target = null;
 
   if (targetFolder == "") {
-    console.log("Create folder" + name);
+    Logger.log("Create folder" + name);
     targetFolder = "Copy of " + name;
     target = DriveApp.createFolder(targetFolder);
   }
@@ -32,45 +35,11 @@ function start(sourceFolderID, targetFolder) {
     console.log("Go to target folder");
     target = DriveApp.getFolderById(targetFolder);
   }
-
-  copyFolder(source, target);
+  var sheet_id = initSheet(targetFolder);
+  copyFolder(source, target, sheet_id);
 }
 
-function getAllNameOfFilesInFolder(folder) {
-  let arr = [];
-  let files = folder.getFiles();
-
-  while (files.hasNext()) {
-    let file = files.next();
-    arr.push(file.getName());
-  }
-  return arr;
-
-}
-
-function getAllNameOfSubfolderInFolder(folder) {
-  let arr = [];
-  let folders = folder.getFolders();
-
-  while (folders.hasNext()) {
-    let folder = folders.next();
-    arr.push(folder.getName());
-  }
-  return arr;
-
-}
-
-function createQuerry(arr) {
-  if (arr.length == 0) return "";
-  var querry = "";
-  for (var i = 0; i < arr.length - 1; i++) {
-    querry += 'title contains \"' + arr[i] + "\" or ";
-    if (i == 100) break;
-  }
-  return querry + "title contains \"" + arr[arr.length - 1] + "\"";
-}
-
-function copyFolder(source, target) {
+function copyFolder(source, target, sheet_id) {
   //Folder copy incomplete
   //Change the symbol at target folder (Folder don't already copy)
   var ispecialFolders = target.searchFolders('title contains \"chuacopyxong\"');
@@ -82,19 +51,19 @@ function copyFolder(source, target) {
     var ifolderInSource = source.getFoldersByName(name); // itor
     while (ifolderInSource.hasNext()) { // has a
       Logger.log("Go to: " + name);
-      copyFolder(ifolderInSource.next(), folder); // copy
+      copyFolder(ifolderInSource.next(), folder, sheet_id); // copy
       folder.setName(name); // Done in folder. Set name again.
     }
-    
+
   }
 
   //Copy normal
   Logger.log("Scan source Folder");
-  var srcSubfolders = getAllNameOfSubfolderInFolder(source);
-  var srcFiles = getAllNameOfFilesInFolder(source);
+  var srcSubfolders = getAllNameItemsInFolder(source, 1);
+  var srcFiles = getAllNameItemsInFolder(source);
   Logger.log("Scan des Folder");
-  var desSubfolders = getAllNameOfSubfolderInFolder(target);
-  var desFiles = getAllNameOfFilesInFolder(target);
+  var desSubfolders = getAllNameItemsInFolder(target, 1);
+  var desFiles = getAllNameItemsInFolder(target);
 
   var diffFolders = srcSubfolders.filter(x => !desSubfolders.includes(x));
   var diffFiles = srcFiles.filter(x => !desFiles.includes(x));
@@ -115,6 +84,7 @@ function copyFolder(source, target) {
         var name = file.getName();
         console.log("Make copy file: " + name);
         file.makeCopy(name, target);
+        appendRow(sheet_id, [getTimeNow(), name, file.getSize()]);
       }
     }
   }
@@ -133,8 +103,9 @@ function copyFolder(source, target) {
         var folder = folders.next();
         var name = folder.getName();
         Logger.log("Create folder: " + name);
+        appendRow(sheet_id, [getTimeNow(), "Create Folder " + name]);
         var targetSub = target.createFolder("chuacopyxong " + name);
-        copyFolder(folder, targetSub);
+        copyFolder(folder, targetSub, sheet_id);
         targetSub.setName(name);
       }
     }
