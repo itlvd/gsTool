@@ -4,20 +4,20 @@ Refer: https://www.labnol.org/code/19979-copy-folders-drive
 */
 var chunk = 100;
 function main() {
-  let src = "https://drive.google.com/drive/folders/ID";
-  let des = "https://drive.google.com/drive/folders/ID";
+  let src = "https://drive.google.com/drive/u/0/folders/ID";
+  let des = "https://drive.google.com/drive/u/0/folders/ID";
 
   try { // Pass this if user input FolderID.
     src = src.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
     des = des.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
-    var count = getNumber(des);
-    setupTrigger(count);
+    deleteTrigger();
+    setupTrigger();
     start(src, des);
   }
   catch (e) {
-    Logger.log("Kiểm tra lại link. Lỗi: " + e);
+    Logger.log("Err: " + e);
   }
-  deleteTrigger();
+  deleteTrigger();// Finish copy or the script has an issue.
 }
 
 function start(sourceFolderID, targetFolder) {
