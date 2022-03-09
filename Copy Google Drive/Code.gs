@@ -35,7 +35,7 @@ function start(sourceFolderID, targetFolder) {
     console.log("Go to target folder");
     target = DriveApp.getFolderById(targetFolder);
   }
-  var sheet_id = initSheet(targetFolder);
+  var sheet_id = ""//initSheet(targetFolder);
   copyFolder(source, target, sheet_id);
 }
 
@@ -84,7 +84,7 @@ function copyFolder(source, target, sheet_id) {
         var name = file.getName();
         console.log("Make copy file: " + name);
         file.makeCopy(name, target);
-        appendRow(sheet_id, [getTimeNow(), name, file.getSize()]);
+        //appendRow(sheet_id, [getTimeNow(), name, file.getSize()]);
       }
     }
   }
@@ -103,7 +103,7 @@ function copyFolder(source, target, sheet_id) {
         var folder = folders.next();
         var name = folder.getName();
         Logger.log("Create folder: " + name);
-        appendRow(sheet_id, [getTimeNow(), "Create Folder " + name]);
+        //appendRow(sheet_id, [getTimeNow(), "Create Folder " + name]);
         var targetSub = target.createFolder("chuacopyxong " + name);
         copyFolder(folder, targetSub, sheet_id);
         targetSub.setName(name);
