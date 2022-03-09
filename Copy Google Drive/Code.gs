@@ -13,11 +13,11 @@ function main() {
     var count = getNumber(des);
     setupTrigger(count);
     start(src, des);
-    deleteTrigger();
   }
   catch (e) {
     Logger.log("Kiểm tra lại link. Lỗi: " + e);
   }
+  deleteTrigger();
 }
 
 function start(sourceFolderID, targetFolder) {
