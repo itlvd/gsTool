@@ -16,4 +16,5 @@ Then, turn on Drive API at Service.
 
 
 You can make copy this script:
-![Script v3.2.1](https://script.google.com/d/16pJX_9uZEzMlnknVnFUSTGQUr00z-agq9pEueBXpWVmObHYWhnjk37gT/edit?usp=sharing)
+
+https://script.google.com/d/16pJX_9uZEzMlnknVnFUSTGQUr00z-agq9pEueBXpWVmObHYWhnjk37gT/edit?usp=sharing
