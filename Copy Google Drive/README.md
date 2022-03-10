@@ -15,3 +15,11 @@ You can make copy this script:
 https://script.google.com/d/16pJX_9uZEzMlnknVnFUSTGQUr00z-agq9pEueBXpWVmObHYWhnjk37gT/edit?usp=sharing
 
 ![](./Copy-script.gif)
+
+## Error
+
+**Service error: Drive**: Please change ```var chunk = 100``` to ```var chunk = 10```.
+
+**Limit Exceeded: Drive**: Quota is exceeded. Please try again after 24 hours.
+
+If you get an error, please create an issue. Thanks.
