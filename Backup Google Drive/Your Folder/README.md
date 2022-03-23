@@ -9,3 +9,9 @@ Make sure you change this variable in your script:
 let src = "Input source folder URL";
 let des = "Input destination folder URL";
 ```
+
+Then turn on Drive Activity in Services. Now, you can run the script.
+
+## Error
+
+DriveActivity is not define: You don't setup Drive Activity above. Please set up it, and try again.
