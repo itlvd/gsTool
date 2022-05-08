@@ -18,7 +18,7 @@ https://script.google.com/d/16pJX_9uZEzMlnknVnFUSTGQUr00z-agq9pEueBXpWVmObHYWhnj
 
 ## Error
 
-**Service error: Drive**: Please change ```var chunk = 100``` to ```var chunk = 10```.
+**Service error: Drive**: Please change ```var chunk = 100``` to ```var chunk = 10``` or ```var chunk = 1```.
 
 **Limit Exceeded: Drive**: Quota is exceeded. Please try again after 24 hours.
 
