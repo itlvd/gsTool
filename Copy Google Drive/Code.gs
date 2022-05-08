@@ -7,24 +7,10 @@ function main() {
   let src = "https://drive.google.com/drive/folders/ID";
   let des = "https://drive.google.com/drive/folders/ID";
 
-  try { //Check valid input and catch the error.
-    src = src.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
-    des = des.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
-    //delete all a previous triggers. If this script have a error and try catch don't works, this is turn off the automatic set up trigger.
-    deleteTrigger();  
-    setupTrigger(); // Run the script
-    
-  }
-  catch (msg) {
-    Logger.log("Err: " + msg);
-    var result = fixError(msg,des);
-    if(result == 1){
-      return;
-    }
+  src = src.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
+  des = des.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
 
-  }
-  start(src, des); // Create new trigger
-  deleteTrigger();// Finish copy or the script has an issue.
+  start(src, des);
 }
 
 //Preprocess the copy.
@@ -33,6 +19,7 @@ function start(sourceFolderID, targetFolder) {
   var source = DriveApp.getFolderById(sourceFolderID);
   var name = source.getName();
   var target = null;
+  var reCopy = false;
 
   //If user do not input destination folder ID, create a new folder in root folder My Drive.
   //Else, the script goes to the destination folder.
@@ -44,10 +31,23 @@ function start(sourceFolderID, targetFolder) {
   else {
     console.log("Go to target folder");
     target = DriveApp.getFolderById(targetFolder);
+    reCopy = true;
   }
   var sheet_id = initSheet(targetFolder);
   var sheet_name = getsheetName(sheet_id);
-  copyFolder(source, target, sheet_id,sheet_name);
+
+  if(reCopy == false){
+    setupTrigger();
+  }
+
+  //Create trigger
+  try{
+    copyFolder(source, target, sheet_id,sheet_name);
+  }
+  catch(e){
+    sendMail(e);
+  }
+  deleteTrigger();// Finish copy or have a issue;
 }
 
 function copyFolder(source, target, sheet_id, sheetName) {
