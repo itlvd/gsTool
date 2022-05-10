@@ -3,8 +3,8 @@ Author: Lê Văn Đông - www.levandong.com
 Refer: https://www.labnol.org/code/19979-copy-folders-drive
 */
 function main() {
-  let src = "https://drive.google.com/drive/folders/1V638aBAkVWKvw3DXmTFJ85ytmp-pCZ0_";
-  let des = "https://drive.google.com/drive/folders/1cyqHIT4ziVDb5eXjd1JZlyVH-mbibdAO";
+  let src = "https://drive.google.com/drive/folders/ID";
+  let des = "https://drive.google.com/drive/folders/ID";
 
   src = src.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
   des = des.match(/(?<=folders\/).*?((?=\?)|$)/g)[0].toString();
