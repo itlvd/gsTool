@@ -12,7 +12,7 @@ let des = "Input destination folder URL";
 
 You can make copy this script:
 
-https://script.google.com/d/16pJX_9uZEzMlnknVnFUSTGQUr00z-agq9pEueBXpWVmObHYWhnjk37gT/edit?usp=sharing
+https://script.google.com/d/1IcybQYnnb-rwAocoI5Sk7jaDkvuet30BGK2jPRsDqAZliFB5mGzzJdqa/edit?usp=sharing
 
 ![](./Copy-script.gif)
 
