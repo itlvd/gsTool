@@ -103,7 +103,7 @@ function copyFolder(source, target, sheet_id, sheetName) {
 
 
   for (var j = 0; j < diffFolders.length; j++) {
-    var folders = source.getFilesByName(diffFolders[j]);
+    var folders = source.getFoldersByName(diffFolders[j]);
     //Copy Folder
     if (folders.hasNext()) {
       var folder = folders.next();
