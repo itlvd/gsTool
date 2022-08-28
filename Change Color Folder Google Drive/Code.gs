@@ -1,5 +1,8 @@
-/*Thanks Stéphane Giron for create folderColor script.
+/*
+Thanks Stéphane Giron for create folderColor script.
 	- Medium: https://medium.com/@stephane.giron/change-google-drive-folder-color-with-apps-script-259743ab1c30
+
+Version: 1.0
 */
 function autoSetColor(){
   var root_folder = DriveApp.getRootFolder();
