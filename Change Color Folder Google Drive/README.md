@@ -8,6 +8,9 @@
 4. Save and Run.
 5. Auth permission script can access to Google Drive.
 
+## Lastest Version
+- 1.0
+
 ## Thanks
 Thank Stéphane Giron for create folderColor script.
 	
