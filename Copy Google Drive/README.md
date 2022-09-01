@@ -35,4 +35,6 @@ https://script.google.com/d/1IcybQYnnb-rwAocoI5Sk7jaDkvuet30BGK2jPRsDqAZliFB5mGz
 
 **Limit Exceeded: Drive**: Quota is exceeded. Please run the script again after 24 hours.
 
+**Copy script file**: Cannot copy script file to the destination folder. The script is always copied to the root folder.
+
 If you get an error, please create an issue. Thanks.
