@@ -2,6 +2,12 @@
 
 You can copy all files from other folder to your folder. When they add a new file or change a document google file, the script won't be copying this file to your folder. You can using for Shared Drive.
 
+```
+⚠️Important: When you run the script after you see "Make copy file: ", you must cancel the script. 
+The autorun will continue in the background. And then, you can exist a script tab.
+```
+![](https://i.imgur.com/QGsO3sM.png)
+
 ## Lastest Version 
 
 V3.3.1
