@@ -4,7 +4,7 @@ You can copy all files from other folder to your folder. When they add a new fil
 
 ```
 ⚠️Important: When you run the script after you see "Make copy file: ", you must cancel the script. 
-The autorun will continue in the background. And then, you can exist a script tab.
+The autorun will continue in the background. And then, you can exit a script tab.
 ```
 ![](https://i.imgur.com/QGsO3sM.png)
 
